@@ -1,13 +1,13 @@
 <template>
   <div class="shoppingcart">
     <div class="header">
-      <span>Winkelwagen ({{ products.length }})</span>
+      <span>Winkelwagen ({{ Object.keys(cartproducts).length }})</span>
       <span @click="openCart()">X</span>
     </div>
     <div class="content">
       <div
         class="item-data"
-        v-for="(item, index) in products"
+        v-for="(item, index) in cartproducts"
         v-bind:key="index"
       >
         <div class="image">
@@ -32,7 +32,7 @@ export default{
   name: "Shoppingcart",
   data() {
     return {
-      products: {},
+      products: new Object(null),
     };
   },
   methods: {
@@ -40,8 +40,10 @@ export default{
       this.$parent.opencart = !this.$parent.opencart;
     },
     getProducts(dataURL) {
-      $.getJSON(dataURL, (data) => {
-        this.products = data;
+      $.getJSON(dataURL, (data) => {  
+		data.forEach((product) => {  
+			this.$store.commit('updateMand', product)
+		})
       });
     },
     formatPrice(amount) {
@@ -56,10 +58,19 @@ export default{
     );
   },
   computed: {
-    cartproducts(){      
+    cartproducts(){
       return this.products;
     },
   },
+	watch:{
+		'$store.state.winkelmand':{
+			immediate: true,
+			deep: true,
+			handler(){
+				this.products = this.$store.state.winkelmand
+			}
+		}
+	}
 };
 </script>
 
